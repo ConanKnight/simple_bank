@@ -11,7 +11,7 @@ type Store struct {
 	db *sql.DB
 }
 
-var txKey = struct{}{}
+//var txKey = struct{}{}
 
 func NewStore(db *sql.DB) *Store {
 	return &Store{
