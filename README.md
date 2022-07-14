@@ -35,5 +35,3 @@ try to work on this file
 
 - Rebase 3
 ddddd
-
-- This is a line I don't want
