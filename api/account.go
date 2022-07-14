@@ -9,7 +9,7 @@ import (
 
 type createAccountRequest struct {
 	Owner    string `json:"owner" binding:"required"`
-	Currency string `json:"currency" binding:"required,oneof=USD EUR"`
+	Currency string `json:"currency" binding:"required,currency"`
 }
 
 func (server *Server) createAccount(ctx *gin.Context) {
@@ -79,4 +79,37 @@ func (server *Server) listAccount(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, accounts)
+}
+
+type updateAccountRequest struct {
+	ID      int32 `form:"account_id" binding:"required,min=1"`
+	Balance int32 `header:"balance" biding:"required"`
+}
+
+func (server *Server) updateAccount(ctx *gin.Context) {
+	var req updateAccountRequest
+	err := ctx.ShouldBindQuery(&req)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	err = ctx.ShouldBindHeader(&req)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateAccountParams{
+		ID:      int64(req.ID),
+		Balance: int64(req.Balance),
+	}
+	account, err := server.store.UpdateAccount(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, account)
+	return
+
 }
